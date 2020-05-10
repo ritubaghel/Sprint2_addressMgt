@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.capgemini.go.dao.IAddressDao;
-import com.capgemini.go.entities.Address;
+import com.capgemini.go.entities.AddressDto;
 import com.capgemini.go.exceptions.AddressNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,39 +25,48 @@ public class AddressServiceImpl implements IAddressService {
     public void setAddressDao(IAddressDao dao) {
         this.addressDao = dao;
     }
-
+    
+    public String generatedId(){
+    	long count=addressDao.count();
+    	count++;
+    	String newId=String.valueOf(count);
+    	return newId;
+    }
+    
     @Override
-	public boolean addAddress(Address addressDTO) {
+	public boolean addAddress(AddressDto addressDTO) {
+    	String id=generatedId();
+    	addressDTO.setAddressId(id);
 		addressDTO = addressDao.save(addressDTO);
 		return true;
 	}
 
 	@Override
-	public boolean deleteAddress(Address addressDTO) {
+	public boolean deleteAddress(AddressDto addressDTO) {
 		String id = addressDTO.getAddressId();
-		Address address = findById(id);
+		AddressDto address = findById(id);
 		addressDao.delete(addressDTO);
 		return true;
 	}
 
 	@Override
-	public boolean updateAddress(Address addressDTO) {
+	public boolean updateAddress(AddressDto addressDTO) {
 		String id = addressDTO.getAddressId();
-		Address address = findById(id);
+		AddressDto address = findById(id);
 		addressDTO = addressDao.save(addressDTO);
 		return true;
 	}
 
 	@Override
-	public List<Address> viewAllAddress(String addressId) {
-		 List<Address>list= addressDao.findAll();
+	public List<AddressDto> viewAllAddress(String addressId) {
+		 List<AddressDto>list= addressDao.findAll();
 	      return list;
 	}
 	@Override
-	public Address findById(String addressId) {
-		Optional<Address> optional = addressDao.findById(addressId);
+	public AddressDto findById(String addressId) {
+		Optional<AddressDto> optional = addressDao.findById(addressId);
 		if (optional.isPresent()) {
-			Address question = optional.get();
+			AddressDto question = optional.get();
 			return question;
 		}
 		throw new AddressNotFoundException("Address not found for id=" + addressId);
